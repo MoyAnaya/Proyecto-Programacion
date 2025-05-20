@@ -1,0 +1,90 @@
+﻿@page "/evento/weather"
+@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+
+@inject IFiestasClientes _fiestasClientes
+@inject IFiestasSalones _fiestasSalones
+@inject IFiestasReserva _fiestasReservas
+
+<h3>Reserva tu salón de eventos</h3>
+
+<EditForm Model="_clientes" OnValidSubmit="Reservas">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3 row">
+        <label for="txtNombre" class="col-sm-2 col-form-label">Nombre</label>
+        <div>
+            <InputText id="txtNombre" class="form-control" @bind-Value="_clientes.Nombre" />
+            <ValidationMessage For="@(() => _clientes.Nombre)" />
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <label for="txtCorreo" class="col-sm-2 col-form-label">Correo</label>
+        <div>
+            <InputText id="txtCorreo" class="form-control" @bind-Value="_clientes.Correo" />
+            <ValidationMessage For="@(() => _clientes.Correo)" />
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <label for="txtTelefono" class="col-sm-2 col-form-label">Teléfono</label>
+        <div>
+            <InputText id="txtTelefono" class="form-control" @bind-Value="_clientes.Telefono" />
+            <ValidationMessage For="@(() => _clientes.Telefono)" />
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <label for="txtFecha" class="col-sm-2 col-form-label">Fecha</label>
+        <div>
+            <InputDate id="txtFecha" class="form-control" @bind-Value="_reserva.fecha" />
+            <ValidationMessage For="@(() => _reserva.fecha)" />
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <label for="selectSalon" class="col-sm-2 col-form-label">Salón</label>
+        <div>
+            <InputSelect id="selectSalon" class="form-control" @bind-Value="_reserva.SalonId">
+                <option value="">Seleccione un salón</option>
+                @foreach (var salon in _salones)
+                {
+                    <option value="@salon.Id">@salon.Nombre</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => _reserva.SalonId)" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-10 offset-sm-2">
+            <button type="submit" class="btn btn-primary">Reservar</button>
+            <button type="button" class="btn btn-danger" @onclick="Cancelar">Cancelar</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private Clientes _clientes = new();
+    private Reserva _reserva = new();
+    private List<Salones> _salones = new(); 
+
+    protected override async Task OnInitializedAsync()
+    {
+        _salones = await _fiestasSalones.GetSalones(); 
+    }
+
+    private async Task Reservas()
+    {
+        await _fiestasClientes.AddCliente(_clientes);
+        _reserva.ClienteId = _clientes.Id;
+        await _fiestasReservas.AddReserva(_reserva);
+        _navigationManager.NavigateTo("/evento");
+    }
+
+    private void Cancelar()
+    {
+        _navigationManager.NavigateTo("/evento");
+    }
+}

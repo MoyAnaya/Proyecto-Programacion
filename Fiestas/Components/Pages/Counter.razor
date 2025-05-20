@@ -1,0 +1,69 @@
+﻿@page "/evento/counter/{id:int}"
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Components
+@inject IFiestasReserva _fiestasReservas
+@inject NavigationManager NavigationManager
+
+<h3>Editar Reservación</h3>
+
+@if (_reserva == null)
+{
+    <p><em>Cargando reserva...</em></p>
+}
+else
+{
+    <EditForm Model="_reserva" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Nombre del Cliente</label>
+            <InputText class="form-control" @bind-Value="_reserva.Cliente.Nombre" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nombre del Salón</label>
+            <InputText class="form-control" @bind-Value="_reserva.Salon.Nombre" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Fecha</label>
+            <InputDate class="form-control" @bind-Value="_reserva.fecha" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private Reserva? _reserva;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _reserva = await _fiestasReservas.GetReserva(id);
+        if (_reserva == null)
+        {
+            NavigationManager.NavigateTo("/evento");
+        }
+    }
+
+    private async Task Guardar()
+    {
+        await _fiestasReservas.UpdateReserva(_reserva);
+        NavigationManager.NavigateTo("/evento");
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/evento");
+    }
+}
+
+
+
+

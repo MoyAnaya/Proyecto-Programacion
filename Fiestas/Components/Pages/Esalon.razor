@@ -1,0 +1,65 @@
+﻿@page "/evento/edicion/{id:int}"
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Components
+@using Fiestas.Data
+@inject IFiestasSalones _fiestasSalones
+@inject NavigationManager NavigationManager
+
+<h3>Editar Salón</h3>
+
+<EditForm Model="_salon" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Nombre del Salón</label>
+        <InputText class="form-control" @bind-Value="_salon.Nombre" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Capacidad</label>
+        <InputNumber class="form-control" @bind-Value="_salon.Capacidad" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Ubicación</label>
+        <InputText class="form-control" @bind-Value="_salon.Ubicacion" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Precio</label>
+        <InputNumber class="form-control" @bind-Value="_salon.Precio" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private Salones _salon = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _salon = await _fiestasSalones.GetSalon(id);
+        if (_salon == null)
+        {
+            NavigationManager.NavigateTo("/evento");
+        }
+    }
+
+    private async Task Guardar()
+    {
+        await _fiestasSalones.UpdateSalon(_salon); 
+        NavigationManager.NavigateTo("/evento");
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/evento");
+    }
+}
+

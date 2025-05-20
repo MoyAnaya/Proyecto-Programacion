@@ -1,0 +1,58 @@
+﻿@page "/evento/agregar"
+@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+
+@inject IFiestasClientes _fiestasClientes
+@inject IFiestasSalones _fiestasSalones
+@inject IFiestasReserva _fiestasReservas
+
+<h3>Nuevo Salón de Eventos</h3> 
+
+<EditForm Model="_salones" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="txtNombre" class="form-label">Nombre</label>
+        <InputText id="txtNombre" class="form-control" @bind-Value="_salones.Nombre" />
+        <ValidationMessage For="@(() => _salones.Nombre)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="txtCapacidad" class="form-label">Capacidad</label>
+        <InputNumber id="txtCapacidad" class="form-control" @bind-Value="_salones.Capacidad" />
+        <ValidationMessage For="@(() => _salones.Capacidad)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="txtUbicacion" class="form-label">Ubicación</label>
+        <InputText id="txtUbicacion" class="form-control" @bind-Value="_salones.Ubicacion" />
+        <ValidationMessage For="@(() => _salones.Ubicacion)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="txtPrecio" class="form-label">Precio</label>
+        <InputNumber id="txtPrecio" class="form-control" @bind-Value="_salones.Precio" />
+        <ValidationMessage For="@(() => _salones.Precio)" />
+    </div>
+
+    <div class="d-flex justify-content-start gap-2">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-danger" @onclick="Cancelar">Cancelar</button>
+    </div>
+</EditForm>
+
+@code {
+    private Salones _salones = new();
+
+    private async Task Guardar(){
+        await _fiestasSalones.AddSalon(_salones);
+        _navigationManager.NavigateTo("/evento");
+    }
+
+    private void Cancelar()
+    {
+        _navigationManager.NavigateTo("/evento");
+    }
+}
+
