@@ -20,8 +20,7 @@ namespace Fiestas.Data
 
         [Required(ErrorMessage = "El precio del salón es obligatorio.")]
         [Range(0, 10000, ErrorMessage = "El precio del salón debe estar entre 0 y 10000.")]
-        public decimal? Precio { get; set; }
+        public decimal Precio { get; set; }
 
-        public virtual ICollection<Reserva>? Reservas { get; set; }
     }
 }
