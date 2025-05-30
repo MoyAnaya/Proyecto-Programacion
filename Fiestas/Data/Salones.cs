@@ -4,6 +4,7 @@ namespace Fiestas.Data
 {
     public class Salones
     {
+        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "El nombre del salón es obligatorio.")]
@@ -20,7 +21,6 @@ namespace Fiestas.Data
 
         [Required(ErrorMessage = "El precio del salón es obligatorio.")]
         [Range(0, 10000, ErrorMessage = "El precio del salón debe estar entre 0 y 10000.")]
-        public decimal Precio { get; set; }
-
+        public decimal? Precio { get; set; }
     }
 }

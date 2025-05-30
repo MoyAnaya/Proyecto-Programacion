@@ -1,0 +1,86 @@
+﻿@page "/clientela"
+@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+
+@inject IFiestasClientes _fiestasClientes
+@inject IFiestasSalones _fiestasSalones
+@inject IFiestasReserva _fiestasReservas
+
+<h3>Clientela</h3>
+
+<button class="btn btn-primary me-2" @onclick="Agregar">Agregar Clientes </button>
+<br />
+<br />
+
+<h4>Salones disponibles</h4>
+
+@if (_listaClientes.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Telefono</th>
+                <th>Correo</th>
+                <th>Reservas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cliente in _listaClientes)
+            {
+                <tr>
+                    <td>@cliente.Nombre</td>
+                    <td>@cliente.Telefono</td>
+                    <td>@cliente.Correo</td>
+                    <td>
+                        @foreach (var reserva in _listaReservas.Where(r => r.ClienteId == cliente.Id))
+                        {
+                            <div>@reserva.fecha.ToShortDateString() - @reserva.Salon.Nombre</div>
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="@(() => Eliminar(cliente.Id))">Eliminar</button>
+                        <button class="btn btn-secondary" @onclick="@(()=> Editar(cliente.Id))">Editar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay salones disponibles.</p>
+}
+
+@code {
+    private List<Salones> _listaSalones = new();
+    private List<Reserva> _listaReservas = new();
+    private List<Clientes> _listaClientes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _listaSalones = await _fiestasSalones.GetSalones();
+        _listaReservas = await _fiestasReservas.GetReservas();
+        _listaClientes = await _fiestasClientes.GetClientes();
+    }
+
+    private void Agregar()
+    {
+        _navigationManager.NavigateTo("/clientela/nuevoc");
+    }
+
+    private async Task Eliminar(int id)
+    {
+        var cliente = await _fiestasClientes.GetCliente(id);
+        await _fiestasClientes.DeleteCliente(cliente);
+        _listaClientes = await _fiestasClientes.GetClientes();
+    }
+
+    private void Editar(int id)
+    {
+        _navigationManager.NavigateTo($"/clientela/editarc/{id}");
+    }
+    
+
+}

@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fiestas.Data
 {
     public class Clientes
     {
+        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "El campo Nombre es obligatorio")]
@@ -19,6 +22,5 @@ namespace Fiestas.Data
         [StringLength(100, ErrorMessage = "El campo Correo no debe ser mayor a 100")]
         public string? Correo { get; set; }
 
-        public virtual ICollection<Reserva>? Reservas { get; set; }
     }
 }

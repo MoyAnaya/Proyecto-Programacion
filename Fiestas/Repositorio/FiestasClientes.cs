@@ -14,6 +14,11 @@ namespace Fiestas.Repositorio
         public async Task<List<Clientes>> GetClientes()
         {
             return await _context.Clientes.ToListAsync();
+
+        }
+        public async Task<List<Clientes>> ListarClientesAsync()
+        {
+            return await _context.Clientes.ToListAsync();
         }
         public async Task<Clientes> GetCliente(int id)
         {
@@ -34,12 +39,6 @@ namespace Fiestas.Repositorio
         {
             _context.Clientes.Remove(cliente);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task<List<Clientes>> ListarClientesAsync()
-        {
-             return await _context.Clientes.ToListAsync();
-            
         }
 
     }   

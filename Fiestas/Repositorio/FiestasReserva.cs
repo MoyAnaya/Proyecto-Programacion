@@ -32,7 +32,15 @@ namespace Fiestas.Repositorio
 
         public async Task UpdateReserva(Reserva reserva)
         {
-            _context.Entry(reserva).State = EntityState.Modified;
+            var existente = await _context.Reservas.FindAsync(reserva.Id);
+
+            if (existente == null)
+                throw new InvalidOperationException("La reserva no existe o fue eliminada.");
+
+            existente.ClienteId = reserva.ClienteId;
+            existente.SalonId = reserva.SalonId;
+            existente.fecha = reserva.fecha;
+
             await _context.SaveChangesAsync();
         }
 

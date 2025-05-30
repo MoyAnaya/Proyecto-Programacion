@@ -17,11 +17,6 @@ namespace Fiestas.Repositorio
             return await _context.Salones.ToListAsync();
         }
 
-        public async Task<Salones> GetSalon(int id)
-        {
-            return await _context.Salones.FindAsync(id);
-        }
-
         public async Task AddSalon(Salones salon)
         {
             _context.Salones.Add(salon);
@@ -58,6 +53,11 @@ namespace Fiestas.Repositorio
         }
 
         public Task UpdateSalones(Salones salon)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Salones?> GetSalon(int id)
         {
             throw new NotImplementedException();
         }

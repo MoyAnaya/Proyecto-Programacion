@@ -1,0 +1,85 @@
+﻿@page "/apartado"
+@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+
+@inject IFiestasClientes _fiestasClientes
+@inject IFiestasSalones _fiestasSalones
+@inject IFiestasReserva _fiestasReservas
+
+<h3>Reservaciones</h3>
+
+<button class="btn btn-primary" @onclick="@(() => Reservar())">Reservar </button>
+<br />
+<br />
+
+<h4>Reservas Realizadas</h4>
+@if (_listaReservas != null)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Salón</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reserva in _listaReservas)
+            { 
+                <tr>
+                    <td>@reserva.Cliente.Nombre</td>
+                    <td>@reserva.Salon.Nombre</td>
+                    <td>@reserva.fecha.ToShortDateString()</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="@(() => Eliminar(reserva.Id))">Eliminar</button>
+                        <button class="btn btn-secondary" @onclick="@(() => Editar(reserva.Id))">Editar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay reservas registradas.</p>
+}
+
+@code {
+    private List<Salones> _listaSalones = new();
+    private List<Reserva> _listaReservas = new();
+    private List<Clientes> _listaClientes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _listaSalones = await _fiestasSalones.GetSalones();
+        _listaReservas = await _fiestasReservas.GetReservas();
+        _listaClientes = await _fiestasClientes.GetClientes();
+    }
+
+
+    private void Reservar()
+    {
+        _navigationManager.NavigateTo("/apartado/weather");
+    }
+
+    private async Task Eliminar(int id)
+    {
+        var reserva = _listaReservas.FirstOrDefault(r => r.Id == id);
+        if (reserva != null)
+        {
+            await _fiestasReservas.DeleteReserva(id);
+
+            _listaReservas = await _fiestasReservas.ListarReservasAsync();
+            _listaClientes = await _fiestasClientes.ListarClientesAsync();
+
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task Editar(int id)
+    {
+        _navigationManager.NavigateTo($"/apartado/change/{id}");
+    }
+}

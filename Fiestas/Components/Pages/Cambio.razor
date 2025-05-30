@@ -1,9 +1,10 @@
-﻿@page "/evento/change/{id:int}"
+﻿@page "/apartado/change/{id:int}"
 @rendermode InteractiveServer
 
 @using Microsoft.AspNetCore.Components
 @inject IFiestasReserva _fiestasReservas
 @inject IFiestasSalones _fiestasSalones
+@inject IFiestasClientes _fiestasClientes
 @inject NavigationManager NavigationManager
 
 <h3>Editar Reservación</h3>
@@ -18,9 +19,18 @@ else
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div class="mb-3">
-            <label class="form-label">Nombre del Cliente</label>
-            <InputText class="form-control" @bind-Value="_reserva.Cliente.Nombre" />
+        <div class="mb-3 row">
+            <label for="selectCliente" class="col-sm-2 col-form-label">Cliente</label>
+            <div>
+                <InputSelect id="selectCliente" class="form-control" @bind-Value="_reserva.ClienteId">
+                    <option value="">Seleccione un cliente</option>
+                    @foreach (var cliente in _clientes)
+                    {
+                        <option value="@cliente.Id">@cliente.Nombre</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => _reserva.ClienteId)" />
+            </div>
         </div>
 
         <div class="mb-3">
@@ -49,28 +59,31 @@ else
     public int id { get; set; }
 
     private Reserva? _reserva;
-    private List<Salones> _salones = new(); 
+    private List<Salones> _salones = new();
+    private List<Clientes> _clientes = new();
+
 
     protected override async Task OnInitializedAsync()
     {
         _reserva = await _fiestasReservas.GetReserva(id);
         _salones = await _fiestasSalones.GetSalones(); 
+        _clientes = await _fiestasClientes.ListarClientesAsync();
 
         if (_reserva == null)
         {
-            NavigationManager.NavigateTo("/evento");
+            NavigationManager.NavigateTo("/apartado");
         }
     }
 
     private async Task Guardar()
     {
         await _fiestasReservas.UpdateReserva(_reserva);
-        NavigationManager.NavigateTo("/evento");
+        NavigationManager.NavigateTo("/apartado");
     }
 
     private void Cancelar()
     {
-        NavigationManager.NavigateTo("/evento");
+        NavigationManager.NavigateTo("/apartado");
     }
 }
 

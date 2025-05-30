@@ -1,0 +1,70 @@
+﻿@page "/clientela/editarc/{id:int}"
+@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+
+@using Microsoft.AspNetCore.Components
+@inject IFiestasClientes _fiestasClientes
+@inject IFiestasSalones _fiestasSalones
+@inject IFiestasReserva _fiestasReservas
+
+<h3>Nuevo Cliente</h3>
+<EditForm Model="_clientes" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="txtNombre" class="form-label">Nombre</label>
+        <InputText id="txtNombre" class="form-control" @bind-Value="_clientes.Nombre" />
+        <ValidationMessage For="@(() => _clientes.Nombre)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="txtTelefono" class="form-label">Telefono</label>
+        <InputText id="txtTelefono" class="form-control" @bind-Value="_clientes.Telefono" />
+        <ValidationMessage For="@(() => _clientes.Telefono)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="txtCorreo" class="form-label">Correo</label>
+        <InputText id="txtCorreo" class="form-control" @bind-Value="_clientes.Correo" />
+        <ValidationMessage For="@(() => _clientes.Correo)" />
+    </div>
+
+
+    <div class="d-flex justify-content-start gap-2">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-danger" @onclick="Cancelar">Cancelar</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private Clientes _clientes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var clienteExistente = await _fiestasClientes.GetCliente(id);
+        if (clienteExistente is not null)
+        {
+            _clientes = clienteExistente;
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/clientela");
+        }
+    }
+
+    private async Task Guardar()
+    {
+        await _fiestasClientes.UpdateCliente(_clientes);
+        _navigationManager.NavigateTo("/clientela");
+    }
+
+    private void Cancelar()
+    {
+        _navigationManager.NavigateTo("/clientela");
+    }
+}
+

@@ -107,13 +107,13 @@ namespace Fiestas.Migrations
             modelBuilder.Entity("Fiestas.Data.Reserva", b =>
                 {
                     b.HasOne("Fiestas.Data.Clientes", "Cliente")
-                        .WithMany("Reservas")
+                        .WithMany()
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Fiestas.Data.Salones", "Salon")
-                        .WithMany("Reservas")
+                        .WithMany()
                         .HasForeignKey("SalonId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -121,16 +121,6 @@ namespace Fiestas.Migrations
                     b.Navigation("Cliente");
 
                     b.Navigation("Salon");
-                });
-
-            modelBuilder.Entity("Fiestas.Data.Clientes", b =>
-                {
-                    b.Navigation("Reservas");
-                });
-
-            modelBuilder.Entity("Fiestas.Data.Salones", b =>
-                {
-                    b.Navigation("Reservas");
                 });
 #pragma warning restore 612, 618
         }

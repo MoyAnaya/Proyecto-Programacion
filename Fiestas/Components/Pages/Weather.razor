@@ -1,4 +1,4 @@
-﻿@page "/evento/weather"
+﻿@page "/apartado/weather"
 @rendermode InteractiveServer
 @inject NavigationManager _navigationManager
 
@@ -8,83 +8,67 @@
 
 <h3>Reserva tu salón de eventos</h3>
 
-<EditForm Model="_clientes" OnValidSubmit="Reservas">
+<EditForm Model="_reserva" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
+    <ValidationSummary  />
 
     <div class="mb-3 row">
-        <label for="txtNombre" class="col-sm-2 col-form-label">Nombre</label>
+        <label for="selectCliente" class="col-sm-2 col-form-label">Cliente</label>
         <div>
-            <InputText id="txtNombre" class="form-control" @bind-Value="_clientes.Nombre" />
-            <ValidationMessage For="@(() => _clientes.Nombre)" />
-        </div>
-    </div>
-
-    <div class="mb-3 row">
-        <label for="txtCorreo" class="col-sm-2 col-form-label">Correo</label>
-        <div>
-            <InputText id="txtCorreo" class="form-control" @bind-Value="_clientes.Correo" />
-            <ValidationMessage For="@(() => _clientes.Correo)" />
-        </div>
-    </div>
-
-    <div class="mb-3 row">
-        <label for="txtTelefono" class="col-sm-2 col-form-label">Teléfono</label>
-        <div>
-            <InputText id="txtTelefono" class="form-control" @bind-Value="_clientes.Telefono" />
-            <ValidationMessage For="@(() => _clientes.Telefono)" />
-        </div>
-    </div>
-
-    <div class="mb-3 row">
-        <label for="txtFecha" class="col-sm-2 col-form-label">Fecha</label>
-        <div>
-            <InputDate id="txtFecha" class="form-control" @bind-Value="_reserva.fecha" />
-            <ValidationMessage For="@(() => _reserva.fecha)" />
-        </div>
-    </div>
-
-    <div class="mb-3 row">
-        <label for="selectSalon" class="col-sm-2 col-form-label">Salón</label>
-        <div>
-            <InputSelect id="selectSalon" class="form-control" @bind-Value="_reserva.SalonId">
-                <option value="">Seleccione un salón</option>
-                @foreach (var salon in _salones)
+            <InputSelect id="selectCliente" class="form-control" @bind-Value="_reserva.ClienteId">
+                <option value="">Seleccione un cliente</option>
+                @foreach (var cliente in _clientes)
                 {
-                    <option value="@salon.Id">@salon.Nombre</option>
+                    <option value="@cliente.Id">@cliente.Nombre</option>
                 }
             </InputSelect>
-            <ValidationMessage For="@(() => _reserva.SalonId)" />
+            <ValidationMessage For="@(() => _reserva.ClienteId)" />
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-sm-10 offset-sm-2">
-            <button type="submit" class="btn btn-primary">Reservar</button>
-            <button type="button" class="btn btn-danger" @onclick="Cancelar">Cancelar</button>
-        </div>
+    <div class="mb-3">
+        <label class="form-label">Nombre del Salón</label>
+        <InputSelect class="form-control" @bind-Value="_reserva.SalonId">
+            <option value="">-- Seleccione un salón --</option>
+            @foreach (var salon in _salones)
+            {
+                <option value="@salon.Id">@salon.Nombre</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => _reserva.SalonId)" />
     </div>
+
+    <div class="mb-3">
+        <label class="form-label">Fecha</label>
+        <InputDate class="form-control" @bind-Value="_reserva.fecha" />
+        <ValidationMessage For="@(() => _reserva.fecha)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
 @code {
-    private Clientes _clientes = new();
     private Reserva _reserva = new();
-    private List<Salones> _salones = new(); 
+    private List<Salones> _salones = new();
+    private List<Clientes> _clientes = new();
+    private string? _error;
 
     protected override async Task OnInitializedAsync()
     {
-        _salones = await _fiestasSalones.GetSalones(); 
+        _salones = await _fiestasSalones.GetSalones();
+        _clientes = await _fiestasClientes.ListarClientesAsync();
     }
 
-    private async Task Reservas()
+    private async Task Guardar()
     {
-        await _fiestasClientes.AddCliente(_clientes);
-        _reserva.ClienteId = _clientes.Id;
+        Console.WriteLine($"ID enviado: {_reserva.Id}");
         await _fiestasReservas.AddReserva(_reserva);
-        _navigationManager.NavigateTo("/evento");
+        _navigationManager.NavigateTo("/apartado");
     }
 
     private void Cancelar()
     {
-        _navigationManager.NavigateTo("/evento");
+        _navigationManager.NavigateTo("/apartado");
     }
 }

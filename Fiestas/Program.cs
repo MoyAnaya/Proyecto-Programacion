@@ -16,6 +16,9 @@ builder.Services.AddScoped<IFiestasClientes, FiestasClientes>();
 builder.Services.AddScoped<IFiestasSalones, FiestasSalones>();
 builder.Services.AddScoped<IFiestasReserva, FiestasReserva>();
 
+builder.Services.AddServerSideBlazor()
+    .AddCircuitOptions(options => { options.DetailedErrors = true; });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

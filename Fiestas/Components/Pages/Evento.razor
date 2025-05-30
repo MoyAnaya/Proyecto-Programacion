@@ -7,95 +7,49 @@
 @inject IFiestasReserva _fiestasReservas
 
 <h3>Reservar Salones</h3>
-<br />
 
-<button class="btn btn-primary me-2" @onclick="Agregar">Agregar Salones </button>
-<button class="btn btn-secondary" @onclick="ToggleVista">
-    @(_mostrarReservas ? "Ver Salones" : "Ver Reservas")
-</button>
+<button class="btn btn-primary me-2" @onclick="Agregar">Agregar Salones </button> <br /> <br />
 
-<button class="btn btn-primary" @onclick="@(() => Reservar())">Reservar </button>
+<h4>Salones disponibles</h4>
 
-<br />
-<br />
-
-@if (_mostrarReservas)
+@if (_listaSalones.Count > 0)
 {
-    <h4>Reservas Realizadas</h4>
-    @if (_listaReservas != null && _listaReservas.Count > 0)
-    {
-        <table class="table table-striped">
-            <thead>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Capacidad</th>
+                <th>Ubicación</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var salon in _listaSalones)
+            {
                 <tr>
-                    <th>Cliente</th>
-                    <th>Salón</th>
-                    <th>Fecha</th>
-                    <th>Acciones</th>
+                    <td>@salon.Nombre</td>
+                    <td>@salon.Capacidad</td>
+                    <td>@salon.Ubicacion</td>
+                    <td>@salon.Precio</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="@(() => EliSalon(salon.Id))">Eliminar</button>
+                        <button class="btn btn-secondary" @onclick="@(()=> EdiSalon(salon.Id))">Editar</button>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var reserva in _listaReservas)
-                {
-                    <tr>
-                        <td>@reserva.Cliente?.Nombre</td>
-                        <td>@reserva.Salon?.Nombre</td>
-                        <td>@reserva.fecha?.ToShortDateString()</td>
-                        <td>
-                            <button class="btn btn-danger" @onclick="@(() => Eliminar(reserva.Id))">Eliminar</button>
-                            <button class="btn btn-secondary" @onclick="@(() => Editar(reserva.Id))">Editar</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>No hay reservas registradas.</p>
-    }
+            }
+        </tbody>
+    </table>
 }
 else
 {
-    @if (_listaSalones.Count > 0)
-    {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Capacidad</th>
-                    <th>Ubicación</th>
-                    <th>Precio</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var salon in _listaSalones)
-                {
-                    <tr>
-                        <td>@salon.Nombre</td>
-                        <td>@salon.Capacidad</td>
-                        <td>@salon.Ubicacion</td>
-                        <td>@salon.Precio</td>
-                        <td>
-                            <button class="btn btn-danger" @onclick="@(() => EliSalon(salon.Id))">Eliminar</button>
-                            <button class="btn btn-secondary" @onclick="@(()=> EdiSalon(salon.Id))">Editar</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>No hay salones disponibles.</p>
-    }
+    <p>No hay salones disponibles.</p>
 }
 
 @code {
     private List<Salones> _listaSalones = new();
     private List<Reserva> _listaReservas = new();
     private List<Clientes> _listaClientes = new();
-    private bool _mostrarReservas = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,49 +61,6 @@ else
     private void Agregar()
     {
         _navigationManager.NavigateTo("/evento/agregar");
-    }
-
-    private void Reservar()
-    {
-        _navigationManager.NavigateTo("/evento/weather");
-    }
-
-    private void ToggleVista()
-    {
-        _mostrarReservas = !_mostrarReservas;
-    }
-
-    private async Task Eliminar(int id)
-    {
-        var reserva = _listaReservas.FirstOrDefault(r => r.Id == id);
-        if (reserva != null)
-        {
-            var clienteId = reserva.ClienteId;
-
-            await _fiestasReservas.DeleteReserva(id);
-
-            var reservasDelCliente = _listaReservas.Where(r => r.ClienteId == clienteId && r.Id != id).ToList();
-
-            if (reservasDelCliente.Count == 0)
-            {
-                var cliente = _listaClientes.FirstOrDefault(c => c.Id == clienteId);
-                if (cliente != null)
-                {
-                    await _fiestasClientes.DeleteCliente(cliente);
-                }
-            }
-
-            _listaReservas = await _fiestasReservas.ListarReservasAsync();
-            _listaClientes = await _fiestasClientes.ListarClientesAsync();
-
-            StateHasChanged();
-        }
-    }
-
-
-    private async Task Editar(int id)
-    {
-        _navigationManager.NavigateTo($"/evento/change/{id}");
     }
 
     private async Task EliSalon(int Id)

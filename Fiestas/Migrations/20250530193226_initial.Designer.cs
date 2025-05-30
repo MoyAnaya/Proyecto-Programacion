@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fiestas.Migrations
 {
     [DbContext(typeof(FiestasContext))]
-    [Migration("20250516181616_Inicial")]
-    partial class Inicial
+    [Migration("20250530193226_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,6 +71,10 @@ namespace Fiestas.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("SalonId");
+
                     b.ToTable("Reservas");
                 });
 
@@ -101,6 +105,25 @@ namespace Fiestas.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Salones");
+                });
+
+            modelBuilder.Entity("Fiestas.Data.Reserva", b =>
+                {
+                    b.HasOne("Fiestas.Data.Clientes", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Fiestas.Data.Salones", "Salon")
+                        .WithMany()
+                        .HasForeignKey("SalonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Salon");
                 });
 #pragma warning restore 612, 618
         }
